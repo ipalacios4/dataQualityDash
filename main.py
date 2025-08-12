@@ -26,6 +26,7 @@ logging.basicConfig(
 )
 
 #1.) Scans a folder of .csv and .json files
+logging.info("Script Starting")
 folderPath = pathlib.Path(args.folder)
 
 if not folderPath.exists():
@@ -33,6 +34,7 @@ if not folderPath.exists():
     exit(1)
 
 
+clean_folder(folderPath, args.dryrun)
 
 
 #2.) Cleans and stores the data in SQLite
