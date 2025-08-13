@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--folder", required=True, help="Path where folder lives")
 parser.add_argument("--logfile")
-parser.add_argument("-dryrun")
+parser.add_argument("--dryrun", action="store_true")
 parser.add_argument("--verbose")
 
 args = parser.parse_args()
