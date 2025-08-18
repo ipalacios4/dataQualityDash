@@ -5,6 +5,7 @@ import logging
 import sqlite3
 import pathlib
 from scripts.cleaner import clean_folder
+from scripts import ingestor
 
 parser = argparse.ArgumentParser()
 
@@ -24,6 +25,7 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+logger = logging.getLogger(__name__)
 
 #1.) Scans a folder of .csv and .json files
 logging.info("Script Starting")
