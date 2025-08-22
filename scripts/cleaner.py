@@ -89,4 +89,10 @@ def clean_folder(path: pathlib.Path, dryrun: bool):
         logging.info(f"Total number of processed files: {fileProcessed}")
         logging.info(f"Number of unsupported files: {fileSkipped}")
         logging.info(f"Number of malformed files:\nCSV:{csvStats['fileError']}\nJSON:{jsonStats['fileError']}")
+
+    else: 
+        return {
+            "CSV" : cleaned_csv,
+            "JSON" : cleaned_json
+        }
  
