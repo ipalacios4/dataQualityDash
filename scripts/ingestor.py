@@ -32,7 +32,7 @@ def create_schema(cursor, logger):
 
 
 
-def prepare_inserts(cleaned, schema, logger):
+def prepare_inserts(cleaned, schema):
     columns = list(schema.keys())
     insert_rows = [tuple(row[field]for field in columns) for row in cleaned]
 
@@ -42,7 +42,7 @@ def prepare_inserts(cleaned, schema, logger):
 def insert_records(cursor, table, columns, values, dryrun, logger):
     placeholders = ", ".join(["?"] * len(columns))
 
-    insert_sql = f"INSERT OR IGNORE INTO {table} ({columns}) VALUES ({placeholders})"
+    insert_sql = f"INSERT OR IGNORE INTO {table} ({", ".join(columns)}) VALUES ({placeholders})"
     logger.debug(f"Preparing SQL: {insert_sql}")
     logger.debug(f"Insert into table: {table}, Rows: {len(values)}")
 
@@ -54,6 +54,7 @@ def insert_records(cursor, table, columns, values, dryrun, logger):
         logger.info(f"Inserted {len(values)} rows into {table}")
     except Exception as err:
         logger.error(f"Failed to insert into {table}: {err}")
+        logger.error(columns)
 
 def commit_or_rollback(conn, dryrun, logger):
     if dryrun:
@@ -66,11 +67,32 @@ def commit_or_rollback(conn, dryrun, logger):
         conn.rollback()
         logger.info("Rolled back uncommited changes")
 
-
-
 def close(conn, logger):
     try:
         conn.close()
         logger.info("Database connection closed.")
     except Exception as err:
         logger.warning(f"Failed to close DB connection: {err}")
+
+
+def ingestor_runner(clean_data, db_path, dryrun, logger):
+    conn, cursor = connect_db(db_path, dryrun) #returns conn and cursor
+    create_schema(cursor, logger)
+    
+    # Prepare and insert for CSV
+    columns, insert_rows = prepare_inserts(clean_data["CSV"], user_schema) #returns columns and cleaned tuples
+    insert_records(cursor, table='users', columns=columns, values=insert_rows, dryrun=dryrun, logger=logger)
+
+    # Prepare and insert for JSON
+    columns, insert_rows = prepare_inserts(clean_data["JSON"], activity_schema)
+    insert_records(cursor, 'activity', columns, insert_rows, dryrun, logger)
+
+    commit_or_rollback(conn, dryrun, logger)
+    close(conn, logger)
+
+
+    #the way this should work is connect
+    # then create_schema for both csv and json x2 calls
+    # prepare_inserts x2 call for each file type
+    # insert_records x2 call for each type
+    # commit or rollback will be on call and so will close be

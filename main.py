@@ -36,7 +36,8 @@ if not folderPath.exists():
     exit(1)
 
 
-clean_folder(folderPath, args.dryrun)
+cleaned = clean_folder(folderPath, args.dryrun)
+ingestor.ingestor_runner(cleaned, "db/test.db", args.dryrun, logger)
 
 
 #2.) Cleans and stores the data in SQLite
