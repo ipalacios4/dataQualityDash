@@ -1,4 +1,4 @@
-#Data Quality Dash 
+# Data Quality Dash 
 This project is an exersie to be able to continue build out my skills in 
 - sciprting using python
 - creating queries within python using SQLite3
